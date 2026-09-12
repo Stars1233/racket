@@ -237,10 +237,10 @@
            [k (if count
                   (cdr k)
                   k)]
-           [mutable (and (pair? k)
-                         (pair? (car k))
-                         (car k))]
-           [k (if mutable
+           [auto (and (pair? k)
+                      (pair? (car k))
+                      (car k))]
+           [k (if auto
                   (cdr k)
                   k)]
            [k (if (and (pair? k)
@@ -248,7 +248,7 @@
                   (cdr k)
                   k)])
       (+ (or count 0)
-         (if mutable (car mutable) 0)
+         (if auto (car auto) 0)
          (cond
           [(null? k) 0]
           [else (loop (cdr k))])))))
@@ -358,6 +358,28 @@
   (let ([key (car key+size)])
     (cond
      [(symbol? key) (cdr key+size)]
-     [else
-      (- (cdr key+size)
-         (prefab-key-count-explicit-fields key))])))
+     [else (- (cdr key+size)
+              (prefab-key-count-auto-fields key))])))
+
+(define (prefab-key-count-auto-fields key)
+  (let loop ([k (cdr key)])
+    (let* ([count (and (pair? k)
+                       (exact-integer? (car k))
+                       (car k))]
+           [k (if count
+                  (cdr k)
+                  k)]
+           [auto (and (pair? k)
+                      (pair? (car k))
+                      (car k))]
+           [k (if auto
+                  (cdr k)
+                  k)]
+           [k (if (and (pair? k)
+                       (vector? (car k)))
+                  (cdr k)
+                  k)])
+      (+ (if auto (car auto) 0)
+         (cond
+          [(null? k) 0]
+          [else (loop (cdr k))])))))

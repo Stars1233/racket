@@ -1717,6 +1717,18 @@
   (test 'zee flag-3d-z f3))
 
 ;; ----------------------------------------
+;; Check that prefab re-made consytructor has the right arity
+
+(let ()
+  (struct contributor (x) #:prefab)
+  (struct person-contributor contributor ([a #:mutable] b) #:prefab)
+  (struct surname-contributor person-contributor (y z w) #:prefab)
+
+  (test 1 procedure-arity (struct-type-make-constructor struct:contributor))
+  (test 3 procedure-arity (struct-type-make-constructor struct:person-contributor))
+  (test 6 procedure-arity (struct-type-make-constructor struct:surname-contributor)))
+
+;; ----------------------------------------
 ;; Make sure that a JIT-inlined predicate doesn't
 ;; fail improperly on chaperones and struct types
 
