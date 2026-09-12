@@ -765,13 +765,13 @@
 ;; ----------------------------------------
 
 (define-racket-record-type struct-undefined-chaperone chaperone
-  [fields]
-  [procedure 'struct-impersonate-apply])
-(define-racket-record-type procedure-struct-undefined-chaperone chaperone
+  [fields])
+(define-racket-record-type procedure-struct-undefined-chaperone struct-undefined-chaperone
   [fields]
   [procedure 'struct-impersonate-apply])
 (define-racket-record-type procedure~-struct-undefined-chaperone procedure-struct-undefined-chaperone
-  [fields])
+  [fields]
+  [procedure 'struct-impersonate-apply])
 
 (define-values (prop:chaperone-unsafe-undefined chaperone-unsafe-undefined? chaperone-unsafe-undefined-ref)
   (make-struct-type-property 'chaperone-unsafe-undefined

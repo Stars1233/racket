@@ -9,7 +9,8 @@
                   unsafe-impersonate-procedure
                   unsafe-chaperone-procedure)
          (only-in '#%unsafe
-                  unsafe-impersonate-hash))
+                  unsafe-impersonate-hash)
+         racket/unsafe/undefined)
 
 (define secondary-hash-unused? (eq? 'cs (system-type 'gc)))
 
@@ -3000,6 +3001,44 @@
     (err/rt-test (blue-ref a1))
 
     (void)))
+
+;; ----------------------------------------
+
+(let ()
+  (struct p (x y))
+  (define up (p unsafe-undefined 0))
+  (test #t (eq? unsafe-undefined (p-x up)))
+  (test #t eqv? 0 (p-y up))
+  (define up/no-undefined (chaperone-struct-unsafe-undefined up))
+  (err/rt-test (p-x up/no-undefined))
+  (test #f procedure? up/no-undefined))
+
+(let ()
+  (struct p (x y)
+    #:property prop:chaperone-unsafe-undefined '(y x))
+  (define up (p unsafe-undefined 0))
+  (test #t (eqv? 0 (p-y up)))
+  (err/rt-test (p-x up))
+  (test #f procedure? up))
+
+(let ()
+  (struct p (x y)
+    #:property prop:procedure 1)
+  (define up (p unsafe-undefined (lambda () 0)))
+  (test #t (eq? unsafe-undefined (p-x up)))
+  (test #t eqv? 0 (up))
+  (define up/no-undefined (chaperone-struct-unsafe-undefined up))
+  (err/rt-test (p-x up/no-undefined))
+  (test #t procedure? up/no-undefined))
+
+(let ()
+  (struct p (x y)
+    #:property prop:procedure 1
+    #:property prop:chaperone-unsafe-undefined '(y x))
+  (define up (p unsafe-undefined (lambda () 0)))
+  (test #t (eqv? 0 (up)))
+  (err/rt-test (p-x up))
+  (test #t procedure? up))
 
 ;; ----------------------------------------
 
